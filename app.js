@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const path = require('path');                                        // require path for ejs
 const Campground = require('./models/campground');                   // get Campground model/object from 
+const ejsMate = require('ejs-mate');
 //methodOverride required for put/patch/delete
 const methodOverride = require('method-override');
 // connect to mongoose
@@ -11,6 +12,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
+app.engine('ejs', ejsMate);
 app.use(methodOverride('_method'))
 app.use(express.urlencoded({ extended: true }));
 // check if data base is connected

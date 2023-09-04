@@ -1,34 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= camp.title%>
-    </title>
-</head>
-
-<body>
-    <h1>
-        <%= camp.title%>
-    </h1>
-    <h2>location: <%= camp.location%>
-    </h2>
-    <%if(camp.price){%>
-        <h2>price: <%=camp.price%>
-        </h2>
-        <%}%>
-            <%if(camp.price){%>
-                <h2>description: <%=camp.description%>
-                </h2>
-                <%}%>
-                    <form action="/campgrounds/<%=camp._id%>?_method=DELETE" method="POST">
-                        <button>Delete Campground</button>
+<% layout('layouts/boilerplate') %>
+    <div class="row">
+        <div class="col-6 offset-3">
+            <div class="card mb-3">
+                <img src="<%=camp.image%>" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <%=camp.title%>>
+                    </h5>
+                    <p class="card-text">
+                        <%= camp.description%>
+                    </p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <%= camp.location%>
+                    </li>
+                    <li class="list-group-item">$<%= camp.price%>/night</li>
+                    <li class="list-group-item">A third item</li>
+                </ul>
+                <div class="card-body">
+                    <a class="card-link btn btn-primary" href="/campgrounds/<%=camp._id%>/edit">Update
+                        Information</a>
+                    <form class="d-inline" action="/campgrounds/<%=camp._id%>?_method=DELETE" method="POST">
+                        <button class="card-link btn btn-danger">Delete Campground</button>
                     </form>
-                    <a href="/campgrounds/<%=camp._id%>/edit">Update Information</a>
-                    <a href="/campgrounds">Campgrounds</a>
-
-</body>
-
-</html>
+                </div>
+                <div class="card-footer text-body-secondary">
+                    2 days ago
+                </div>
+            </div>
+        </div>
+    </div>
