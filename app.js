@@ -1,11 +1,14 @@
 const express = require('express');
 const app = express();
 const path = require('path');                                        // require path for ejs
-const Campground = require('./models/campground');                   // get Campground model/object from 
+///////////////////////////////////////////////////////////
+//MODELS
+const Review = require('./models/review')                            // get Review model/object from review.js
+const Campground = require('./models/campground');                   // get Campground model/object from campground.js
 const ejsMate = require('ejs-mate');
 //JOI
 const joi = require('joi')
-const { campgroundSchema } = require('./schemas')
+const { campgroundSchema, reviewSchema } = require('./schemas')
 //UTILITIES
 const expressError = require('./utils/expressError');
 const wrapAsynch = require('./utils/wrapAsync');
@@ -33,7 +36,14 @@ const validateCampground = (req, res, next) => {
     else { next(); }
 }
 
-
+const validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(', ')
+        throw new expressError(msg, 400);
+    }
+    else { next(); }
+}
 
 
 
@@ -65,7 +75,8 @@ app.post('/campgrounds', validateCampground, wrapAsynch(async (req, res, next) =
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //READ ROUTE
 app.get('/campgrounds/:id', wrapAsynch(async (req, res, next) => {
-    const camp = await Campground.findById(req.params.id);
+    const camp = await Campground.findById(req.params.id).populate('reviews');
+
     res.render('campgrounds/show', { camp });
 }));
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,12 +95,30 @@ app.put('/campgrounds/:id', validateCampground, wrapAsynch(async (req, res, next
 app.delete('/campgrounds/:id', wrapAsynch(async (req, res, next) => {
     const { id } = req.params;
     const camp = await Campground.findByIdAndDelete(id);
+
     res.redirect('/campgrounds');
 }));
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//NESTED ROUTE CREATING REVIEWS
+app.post('/campgrounds/:id/reviews', validateReview, wrapAsynch(async (req, res, next) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review)
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`)
+}))
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//NESTED ROUTE DELETING REVIEWS
+app.delete('/campgrounds/:id/reviews/:reviewId', wrapAsynch(async (req, res, next) => {
+    const { id, reviewId } = req.params;
+    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`);
+}))
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //ERROR HANDLER
-
-
 app.all('*', (req, res, next) => {
     next(new expressError('Page Not Found', 404));
 })
