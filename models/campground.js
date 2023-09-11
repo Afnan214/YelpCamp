@@ -1,10 +1,18 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Review = require('./review.js')
+const Review = require('./review.js');
+//https://res.cloudinary.com/demo/image/upload/w_100/docs/models.jpg
+const ImageSchema = new Schema({
+    url: String,
+    filename: String
+});
 
+ImageSchema.virtual('thumbnail').get(function () {
+    return this.url.replace('/upload', '/upload/w_200')
+});
 const CampgroundsSchema = new Schema({
     title: String,
-    image: String,
+    images: [ImageSchema],
     price: Number,
     description: String,
     location: String,
@@ -19,6 +27,9 @@ const CampgroundsSchema = new Schema({
         }
     ]
 });
+
+
+
 
 CampgroundsSchema.post('findOneAndDelete', async function (doc) {
     console.log(doc);

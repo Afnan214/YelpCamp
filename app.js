@@ -1,3 +1,6 @@
+if (process.env.NODE_ENV !== "prodcution") {
+    require('dotenv').config();
+}
 const express = require('express');
 const app = express();
 //MODELS
