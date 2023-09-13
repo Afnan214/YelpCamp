@@ -11,9 +11,11 @@
                     <%=err.message%>
                 </p>
                 <hr>
+                <% if(process.env.NODE_ENV !== "production"){ %>
                 <p>
                     <%=err.stack%>
                 </p>
+                <% } %>
             </div>
 
         </div>

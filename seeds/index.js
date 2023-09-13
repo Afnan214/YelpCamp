@@ -29,13 +29,17 @@ const uniqueTitle = () => {
 // create new campgrounds
 const seedDB = async () => {
     await Campground.deleteMany({});
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 200; i++) {
         const random1000 = Math.floor(Math.random() * 1000);
         const cprice = Math.floor(Math.random() * 20) + 10
         const camp = new Campground({
             title: uniqueTitle(),
             location: `${cities[random1000].city}, ${cities[random1000].state}`,
-            geometry: { type: 'Point', coordinates: [-73.9826608125, 40.76872225] },
+            geometry: {
+                type: 'Point',
+                coordinates: [cities[random1000].longitude,
+                cities[random1000].latitude]
+            },
             images: [{
                 url: 'https://res.cloudinary.com/dztcgrrzg/image/upload/v1694407271/YelpCamp/n5llpz9lhjo95igq5ara.jpg',
                 filename: 'YelpCamp/n5llpz9lhjo95igq5ara',
